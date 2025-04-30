@@ -95,7 +95,7 @@ def run_scientific_fetcher(prompt: str) -> Dict[str, Any]:
             if title:
                 summary = summary.replace(title, f"**{title}**")
 
-        markdown_output = f"# Scientific Summary\n\n**Prompt:** {prompt}\n\n**Summary:**\n{summary}\n\n---\n\n## 📄 Information on the total number of items extracted, including those identified as most relevant by the agent ({len(articles)})\n"
+        markdown_output = f"# Scientific Summary\n\n**Prompt:** {prompt}\n\n**Summary:**\n{summary}\n\n---\n\n## Information on the total number of items extracted, including those identified as most relevant by the agent ({len(articles)})\n"
 
         for idx, article in enumerate(articles, 1):
             markdown_output += (
@@ -117,6 +117,8 @@ def run_scientific_fetcher(prompt: str) -> Dict[str, Any]:
             "markdown": markdown_output,
             "output_file": str(output_path)
         }
+
+        return result_data
 
     except Exception as e:
         logger.error(f"❌ Agent failed with error: {e}")
