@@ -1,0 +1,8 @@
+langchain==0.3.24
+langchain-core==0.3.56
+langchain-openai==0.3.14
+openai==1.76.2
+python-dotenv==1.1.0
+requests==2.32.3
+tqdm==4.67.1
+colorlog==6.9.0
