@@ -72,9 +72,9 @@ SciFetch/
 
 ## Script Overview
 
-| Script | Purpose |
-|:---|:---|
-| `scientific_fetcher.py` | Main agent script that takes a user prompt, queries academic APIs, summarizes findings using GPT-4o, and saves the output to Markdown and PDF. |
+| Script                   | Purpose                                                                                                                                        |
+|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| `scientific_fetcher.py`  | Main agent script that takes a user prompt, queries academic APIs, summarizes findings using GPT-4o, and saves the output to Markdown and PDF. |
 
 ---
 
