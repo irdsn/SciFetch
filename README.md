@@ -53,7 +53,7 @@ SciFetch aims to provide:
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```bash
 SciFetch/
