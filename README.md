@@ -72,15 +72,10 @@ SciFetch/
 
 ## Script Overview
 
-| Script                   | Purpose                                                                                                                                        |
-|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
-| `scientific_fetcher.py`  | Main agent script that takes a user prompt, queries academic APIs, summarizes findings using GPT-4o, and saves the output to Markdown and PDF. |
-
----
-
-## Utilities
-
-- `utils/logs_config.py` : Centralized logging configuration with info/debug/error levels.
+| Script / Module                | Description                                                                                                                                    |
+|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| `agents/scientific_fetcher.py` | Main agent script that takes a user prompt, queries academic APIs, summarizes findings using GPT-4o, and saves the output to Markdown and PDF. |
+| `utils/logs_config.py`         | Centralized logging configuration with info/debug/error levels.                                                                                |
 
 ---
 
