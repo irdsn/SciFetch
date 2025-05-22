@@ -20,7 +20,6 @@ Data & Artificial Intelligence Engineer
 - [Key Features](#key-features)
 - [Project Structure](#project-structure)
 - [Script Overview](#script-overview)
-- [Utilities](#utilities)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Important Notes](#important-notes)
