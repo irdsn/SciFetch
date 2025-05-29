@@ -19,20 +19,38 @@ from typing import List, Dict
 from utils.logs_config import logger
 
 ##################################################################################################
-#                                     EUROPE PMC CLIENT                                          #
-#                                                                                                #
-# Interacts with the Europe PMC API to fetch article metadata.                                   #
-# Returns normalized fields across all results.                                                  #
-#                                                                                                #
-# :param query: Search string to query in the EuropePMC API                                      #
-# :param max_results: Maximum number of results to return                                        #
-# :return: List of dictionaries with normalized article metadata                                 #
+#                                        IMPLEMENTATION                                          #
 ##################################################################################################
 
 class EuropePMCClient:
+    """
+    Client for querying the Europe PMC API and retrieving article metadata.
+
+    This class sends search requests to the Europe PMC REST API and processes the JSON
+    response to extract structured metadata including title, abstract, DOI, source,
+    publication date, and article URL.
+
+    Attributes:
+        BASE_URL (str): Endpoint for the Europe PMC REST API.
+    """
+
     BASE_URL = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
 
     def search(self, query: str, max_results: int = 10) -> List[Dict]:
+        """
+        Searches the Europe PMC API for academic articles based on a free-text query.
+
+        Extracts relevant metadata fields from each result and returns a list of normalized
+        dictionaries. Fields include title, abstract, DOI, publication date, and a constructed URL.
+
+        Args:
+            query (str): Search query string to be submitted to the API.
+            max_results (int): Maximum number of articles to return (default is 10).
+
+        Returns:
+            List[Dict]: List of dictionaries, each representing a scientific article.
+        """
+
         logger.info(f"🔍 [EuropePMC] Launching search for query: {query}")
         params = {
             "query": query,
@@ -58,18 +76,30 @@ class EuropePMCClient:
             })
         return results
 
-##################################################################################################
-#                                        EUROPE PMC TOOL                                         #
-#                                                                                                #
-# Tool wrapper for LangChain-like agents to invoke search functionality of EuropePMC.            #
-#                                                                                                #
-# :param query: Natural language query to pass to the search function                            #
-# :return: List of article metadata results                                                      #
-##################################################################################################
-
 class EuropePMCTool:
+    """
+    LangChain-compatible wrapper for the EuropePMCClient.
+
+    This tool exposes a callable interface to the Europe PMC search functionality,
+    making it usable by autonomous agents or pipelines that rely on tool orchestration.
+
+    Attributes:
+        name (str): Identifier used for selecting the tool.
+        description (str): Human-readable description for agent selection logic.
+    """
+
     name = "europe_pmc_search"
     description = "Use this tool to find academic content from Europe PMC."
 
     def __call__(self, query: str) -> List[Dict]:
+        """
+        Executes a Europe PMC search using the provided query string.
+
+        Args:
+            query (str): Natural language search query.
+
+        Returns:
+            List[Dict]: Retrieved metadata entries from the Europe PMC API.
+        """
+
         return EuropePMCClient().search(query)

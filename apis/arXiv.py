@@ -21,19 +21,38 @@ from typing import List, Dict
 from bs4 import BeautifulSoup
 
 ##################################################################################################
-#                                         ARXIV CLIENT                                           #
-#                                                                                                #
-# Queries the arXiv API and parses results to extract clean, structured data fields.             #
-#                                                                                                #
-# :param query: Free-text string for article search.                                             #
-# :param max_results: Maximum number of articles to return.                                      #
-# :return: List of dictionaries, one per article with standardized keys.                         #
+#                                        IMPLEMENTATION                                          #
 ##################################################################################################
 
 class ArxivClient:
+    """
+    Interface for querying the arXiv API and retrieving structured scientific article metadata.
+
+    This client sends a free-text search query to the arXiv API and parses the XML response
+    using BeautifulSoup to extract standardized fields for each result. It is designed to
+    integrate seamlessly with pipelines requiring structured scientific inputs.
+
+    Attributes:
+        BASE_URL (str): Base URL of the arXiv API endpoint.
+    """
+
     BASE_URL = "http://export.arxiv.org/api/query"
 
     def search(self, query: str, max_results: int = 10) -> List[Dict]:
+        """
+        Searches the arXiv API for scientific articles matching a given free-text query.
+
+        The results are parsed from XML and returned as a list of dictionaries with standardized keys,
+        including title, abstract, DOI (if available), URL, publication date, and source.
+
+        Args:
+            query (str): Free-text search query to submit to arXiv.
+            max_results (int): Maximum number of articles to retrieve (default is 10).
+
+        Returns:
+            List[Dict]: A list of articles, each represented as a dictionary with structured metadata.
+        """
+
         params = {
             "search_query": f"all:{query}",
             "start": 0,
@@ -68,26 +87,54 @@ class ArxivClient:
 
         return results
 
-##################################################################################################
-#                                     LANGCHAIN TOOL WRAPPER                                     #
-#                                                                                                #
-# Wraps ArxivClient in a callable interface suitable for use with LangChain agents.              #
-# Implements required __call__, _run, and _arun methods.                                         #
-#                                                                                                #
-# :param query: The search query string passed to the client.                                    #
-# :return: List of articles returned by the client.                                              #
-##################################################################################################
-
 class ArxivTool:
+    """
+    LangChain-compatible wrapper for the ArxivClient.
+
+    This tool provides a callable interface for use in LangChain autonomous agents.
+    It exposes the arXiv search functionality via __call__ and implements _run for
+    compatibility. Async execution (_arun) is not supported.
+
+    Attributes:
+        name (str): Tool identifier used by LangChain.
+        description (str): Description used to guide agent tool selection.
+    """
+
     name = "arxiv_search"
     description = "Use this tool to find titles and abstracts from arXiv based on a query. Returns structured JSON."
 
     def __call__(self, query: str) -> List[Dict]:
-        client = ArxivClient()
-        return client.search(query=query)
+        """
+        Invokes the arXiv search using the provided query.
+
+        Args:
+            query (str): Free-text query string.
+
+        Returns:
+            List[Dict]: List of articles matching the query.
+        """
+
+        return ArxivClient().search(query=query)
 
     def _run(self, query: str):
+        """
+        Synchronous execution wrapper for LangChain compatibility.
+
+        Args:
+            query (str): The query to be passed to the arXiv client.
+
+        Returns:
+            List[Dict]: List of articles returned by the client.
+        """
+
         return self.__call__(query)
 
     def _arun(self, query: str):
+        """
+        Placeholder for asynchronous execution (not implemented).
+
+        Raises:
+            NotImplementedError: Asynchronous calls are not supported for this tool.
+        """
+
         raise NotImplementedError("Async not supported for ArxivTool.")

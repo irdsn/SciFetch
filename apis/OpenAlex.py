@@ -11,19 +11,37 @@ import requests
 from typing import List, Dict
 
 ##################################################################################################
-#                                 OPENALEX API CLIENT                                            #
-#                                                                                                #
-# Queries the OpenAlex API and extracts the results in a standardized format.                    #
-#                                                                                                #
-# :param query: Search string to send to the OpenAlex API                                        #
-# :param max_results: Number of results to retrieve                                              #
-# :return: List of formatted documents with title, abstract, doi, etc.                           #
+#                                        IMPLEMENTATION                                          #
 ##################################################################################################
 
 class OpenAlexClient:
+    """
+    Client for querying the OpenAlex API to retrieve academic publication metadata.
+
+    This class sends search queries to OpenAlex and extracts structured metadata from
+    the response. It also handles decoding of abstracts stored in inverted index format.
+
+    Attributes:
+        BASE_URL (str): Base URL for the OpenAlex API endpoint.
+    """
+
     BASE_URL = "https://api.openalex.org/works"
 
     def search(self, query: str, max_results: int = 10) -> List[Dict]:
+        """
+        Searches the OpenAlex API for publications matching a query.
+
+        Extracts key fields such as title, abstract, DOI, source, URL, and publication date.
+        Abstracts are decoded from OpenAlex's inverted index format using `decode_abstract`.
+
+        Args:
+            query (str): Free-text search query.
+            max_results (int): Number of results to retrieve (default is 10).
+
+        Returns:
+            List[Dict]: A list of structured metadata dictionaries for each publication.
+        """
+
         params = {
             "search": query,
             "per_page": max_results,
@@ -48,16 +66,20 @@ class OpenAlexClient:
 
         return results
 
-##################################################################################################
-#                             DECODE ABSTRACT FROM INVERTED INDEX                                #
-#                                                                                                #
-# Reconstructs the abstract string from OpenAlex's inverted index representation.                #
-#                                                                                                #
-# :param item: A single publication result from OpenAlex API                                     #
-# :return: Decoded abstract string                                                               #
-##################################################################################################
-
     def decode_abstract(self, item: Dict) -> str:
+        """
+        Decodes an abstract stored in OpenAlex's inverted index format.
+
+        The inverted index maps each word to a list of positions. This method reconstructs
+        the abstract string by ordering the words according to their position in the index.
+
+        Args:
+            item (Dict): A single result item from the OpenAlex API.
+
+        Returns:
+            str: Decoded abstract string, or empty string if no abstract is available.
+        """
+
         inverted = item.get("abstract_inverted_index")
         if not inverted:
             return ""
@@ -65,18 +87,30 @@ class OpenAlexClient:
         abstract = " ".join(word_positions.get(i, "") for i in range(max(word_positions.keys()) + 1))
         return abstract
 
-##################################################################################################
-#                                   OPENALEX TOOL WRAPPER                                        #
-#                                                                                                #
-# LangChain-compatible wrapper that enables calling the OpenAlexClient as a tool.                #
-#                                                                                                #
-# :param query: Search query string                                                              #
-# :return: List of results from OpenAlex                                                         #
-##################################################################################################
-
 class OpenAlexTool:
+    """
+    LangChain-compatible wrapper for the OpenAlexClient.
+
+    This tool provides a callable interface for querying OpenAlex and retrieving
+    academic publication metadata. Designed for use in autonomous agent frameworks.
+
+    Attributes:
+        name (str): Identifier for the tool within the LangChain agent environment.
+        description (str): Description used for agent tool selection and reasoning.
+    """
+
     name = "openalex_search"
     description = "Use this tool to find titles and abstracts from OpenAlex based on scientific queries."
 
     def __call__(self, query: str) -> List[Dict]:
+        """
+        Executes a publication search on OpenAlex using the provided query.
+
+        Args:
+            query (str): Free-text scientific query.
+
+        Returns:
+            List[Dict]: List of publication metadata entries from OpenAlex.
+        """
+
         return OpenAlexClient().search(query)
