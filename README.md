@@ -1,7 +1,7 @@
 # SciFetch: Autonomous Agent for Scientific Literature Retrieval
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue.svg)
-![Last Updated](https://img.shields.io/badge/Last%20Updated-April%202025-brightgreen)
+![Last Updated](https://img.shields.io/badge/Last%20Updated-May%202025-brightgreen)
 
 SciFetch is an autonomous LangChain-based agent designed to search, summarize, and store scientific literature based on user-provided prompts. It intelligently selects the best academic APIs for each topic, provides a synthesized summary, and outputs results in Markdown.
 
