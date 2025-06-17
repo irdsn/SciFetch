@@ -1,6 +1,9 @@
 # Virtual environment
 .venv/
 
+# Local environment variables
+.env
+
 # Python cache
 __pycache__/
 *.py[cod]
@@ -19,9 +22,6 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Local environment variables
-.env
-
 # Compiled bytecode (just in case)
 *.so
 *.pyd
@@ -30,3 +30,7 @@ Thumbs.db
 *.egg-info/
 dist/
 build/
+
+# Pytest coverage reports
+.coverage
+htmlcov/

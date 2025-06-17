@@ -24,6 +24,7 @@ from utils.logs_config import logger
 
 from dotenv import load_dotenv
 from pathlib import Path
+import os
 
 ##################################################################################################
 #                                        CONFIGURATION                                           #
@@ -31,8 +32,11 @@ from pathlib import Path
 
 load_dotenv()
 
-OUTPUT_DIR = Path("outputs")
-OUTPUT_DIR.mkdir(exist_ok=True)
+#OUTPUT_DIR = Path("outputs")
+#OUTPUT_DIR.mkdir(exist_ok=True)
+
+OUTPUT_DIR = Path.home() / "Downloads" / "SciFetch"
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 ##################################################################################################
 #                                        IMPLEMENTATION                                          #
@@ -63,25 +67,18 @@ def extract_relevant_articles(summary: str, articles: List[Dict[str, Any]]) -> L
                 break
     return matched_titles
 
-def run_scientific_fetcher(prompt: str) -> Dict[str, Any]:
+def run_agent(prompt: str) -> Dict[str, Any]:
     """
-    Executes an autonomous LangChain agent to fetch and summarize scientific literature
-    based on a user-defined research prompt.
+    Main function to run the LangChain-based agent for scientific literature retrieval.
 
-    The agent selects the best tools (APIs) for the task, invokes them via LangChain,
-    and aggregates the retrieved article inputs. It then prompts the LLM to generate a
-    summary highlighting the most relevant papers. The summary and full article list
-    are saved in Markdown format to disk.
+    Given a research prompt, the agent selects relevant tools (APIs), fetches articles,
+    summarizes the findings, and saves everything in Markdown format.
 
     Args:
         prompt (str): The research question or topic provided by the user.
 
     Returns:
-        Dict[str, Any]: A dictionary containing:
-            - 'summary' (str): Text summary of the findings.
-            - 'articles' (List[Dict[str, Any]]): All fetched articles.
-            - 'markdown' (str): Markdown-formatted output.
-            - 'output_file' (str): Path to the saved Markdown file.
+        Path: Path to the generated Markdown output file.
     """
 
     tools = [
@@ -169,7 +166,7 @@ def run_scientific_fetcher(prompt: str) -> Dict[str, Any]:
 ##################################################################################################
 
 if __name__ == "__main__":
-    user_prompt = input("Enter your scientific research prompt: ")
-    result = run_scientific_fetcher(user_prompt)
+    user_prompt = input("Provide your scientific research prompt: ")
+    result = run_agent(user_prompt)
     print(result["markdown"])
     print(f"\n✅ Output saved to: {result['output_file']}")
