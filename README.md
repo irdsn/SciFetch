@@ -22,6 +22,7 @@ Data & Artificial Intelligence Engineer
 - [Key Features](#key-features)
 - [Project Structure](#project-structure)
 - [Script Overview](#script-overview)
+- [Tests & Coverage](#tests--coverage)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Future Work](#future-work)
