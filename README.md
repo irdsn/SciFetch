@@ -12,7 +12,7 @@ SciFetch is an autonomous LangChain-based agent designed to search, summarize, a
 ## Author
 
 Íñigo Rodríguez Sánchez  
-Data & Artificial Intelligence Engineer
+Data & AI Engineer
 
 ---
 

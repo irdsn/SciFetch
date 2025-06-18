@@ -10,33 +10,28 @@
 #                                            IMPORTS                                             #
 ##################################################################################################
 
+from dotenv import load_dotenv
+from pathlib import Path
+from typing import List, Dict, Any
+
 from langchain.agents import initialize_agent, Tool
 from langchain.agents.agent_types import AgentType
 from langchain_openai import ChatOpenAI
-from typing import List, Dict, Any
 
 from apis.PubMed import PubMedTool
 from apis.arXiv import ArxivTool
 from apis.OpenAlex import OpenAlexTool
 from apis.EuropePMC import EuropePMCTool
 from apis.CrossRef import CrossRefTool
-from utils.logs_config import logger
 
-from dotenv import load_dotenv
-from pathlib import Path
-import os
+from utils.logs_config import logger
+from utils.config import OUTPUT_DIR
 
 ##################################################################################################
 #                                        CONFIGURATION                                           #
 ##################################################################################################
 
 load_dotenv()
-
-#OUTPUT_DIR = Path("outputs")
-#OUTPUT_DIR.mkdir(exist_ok=True)
-
-OUTPUT_DIR = Path.home() / "Downloads" / "SciFetch"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 ##################################################################################################
 #                                        IMPLEMENTATION                                          #
