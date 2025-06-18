@@ -1,5 +1,8 @@
 # Virtual environment
 .venv/
+venv/
+env/
+ENV/
 
 # Local environment variables
 .env
@@ -11,6 +14,9 @@ __pycache__/
 
 # System files (Mac/Windows)
 .DS_Store
+.AppleDouble
+.LSOverride
+__MACOSX/
 Thumbs.db
 
 # Logs and temp files
@@ -21,6 +27,11 @@ Thumbs.db
 # IDE/editor settings
 .idea/
 .vscode/
+*.swp
+
+# Temporary editor swap files
+*~
+*.orig
 
 # Compiled bytecode (just in case)
 *.so
