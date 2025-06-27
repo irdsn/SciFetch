@@ -14,15 +14,10 @@
 
 import os
 import logging
-
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.requests import Request
-
-from markdown import markdown
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
 from agents.scientific_fetcher import run_agent
 from utils.config import OUTPUT_DIR
 
@@ -43,6 +38,18 @@ app = FastAPI(
                 "It intelligently selects the best academic APIs for each topic, "
                 "provides a synthesized summary, and outputs results in Markdown.",
     version="1.0.0"
+)
+
+##################################################################################################
+#                                             CORS                                               #
+##################################################################################################
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Frontend local
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 ##################################################################################################
@@ -135,31 +142,6 @@ def download_file(filename: str):
         filename=filename,
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
-
-
-
-templates = Jinja2Templates(directory="templates")
-
-@app.get("/preview/{filename}")
-def preview_file(request: Request, filename: str):
-    """
-    Renders the Markdown file as HTML preview with download option.
-    """
-    file_path = OUTPUT_DIR / filename
-
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail="File not found")
-
-    with open(file_path, "r", encoding="utf-8") as f:
-        raw_md = f.read()
-
-    html_content = markdown(raw_md, extensions=["fenced_code", "tables"])
-    return templates.TemplateResponse("preview.html", {
-        "request": request,
-        "filename": filename,
-        "content": html_content
-    })
-
 
 ##################################################################################################
 #                                        ROOT ENDPOINT                                           #
