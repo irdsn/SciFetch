@@ -14,12 +14,17 @@
 
 import os
 import logging
+
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
+
+from markdown import markdown
 from pydantic import BaseModel
+
 from agents.scientific_fetcher import run_agent
 from utils.config import OUTPUT_DIR
-
 
 ##################################################################################################
 #                                        CONFIGURATION                                           #
@@ -74,17 +79,30 @@ def run_scifetch(request: PromptRequest):
         # Run the autonomous agent
         result = run_agent(request.prompt)
 
+        logging.info(f"Agent result: {result}")
+
+        output_path = result.get("output_file")
+
+        if not output_path:
+            raise HTTPException(status_code=500, detail="No output file path returned by agent.")
+
+        # Convert to string path in case it's a Path object
+        output_path = str(output_path)
+
         # Read content to return in response
-        with open(result["output_file"], "r", encoding="utf-8") as f:
+        with open(output_path, "r", encoding="utf-8") as f:
             content = f.read()
 
         filename = result["output_file"].split("/")[-1]
         download_url = f"https://scifetch.onrender.com/download/{filename}"
 
+        base_url = os.getenv("BASE_URL", "http://localhost:8000")
+
         return {
             "message": "✅ File generated successfully.",
             "filename": filename,
-            "download_url": download_url,
+            "preview_url": f"{base_url}/preview/{filename}",
+            "download_url": f"{base_url}/download/{filename}",
             "output_file": result["output_file"],
             "content": content
         }
@@ -113,9 +131,35 @@ def download_file(filename: str):
 
     return FileResponse(
         path=file_path,
-        media_type="text/markdown",
-        filename=filename
+        media_type="application/octet-stream",  # Esto fuerza descarga
+        filename=filename,
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
+
+
+
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/preview/{filename}")
+def preview_file(request: Request, filename: str):
+    """
+    Renders the Markdown file as HTML preview with download option.
+    """
+    file_path = OUTPUT_DIR / filename
+
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        raw_md = f.read()
+
+    html_content = markdown(raw_md, extensions=["fenced_code", "tables"])
+    return templates.TemplateResponse("preview.html", {
+        "request": request,
+        "filename": filename,
+        "content": html_content
+    })
+
 
 ##################################################################################################
 #                                        ROOT ENDPOINT                                           #

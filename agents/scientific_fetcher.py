@@ -95,6 +95,10 @@ def run_agent(prompt: str) -> Dict[str, Any]:
 
     try:
         result = agent.invoke({"input": prompt})
+
+        if not result or "intermediate_steps" not in result:
+            raise RuntimeError("Agent returned no valid output or failed internally.")
+
         intermediate_steps = result.get("intermediate_steps", [])
 
         articles = []
@@ -114,7 +118,9 @@ def run_agent(prompt: str) -> Dict[str, Any]:
         )
 
         for article in articles:
-            summary_prompt += f"- {article.get('title', '')}: {article.get('abstract', '')[:500]}\n"
+            title = article.get("title", "")
+            abstract = article.get("abstract") or ""
+            summary_prompt += f"- {title}: {abstract[:500]}\n"
 
         summary_response = llm.invoke(summary_prompt)
         summary = summary_response.content.strip()
@@ -130,13 +136,15 @@ def run_agent(prompt: str) -> Dict[str, Any]:
         markdown_output = f"# Scientific Summary\n\n**Prompt:** {prompt}\n\n**Summary:**\n{summary}\n\n---\n\n## Information on the total number of items extracted, including those identified as most relevant by the agent ({len(articles)})\n"
 
         for idx, article in enumerate(articles, 1):
+            title = article.get("title", "No Title")
+            abstract = article.get("abstract") or ""
             markdown_output += (
                 f"\n### {idx}. {article.get('title', 'No Title')}\n"
                 f"- **Date:** {article.get('publication_date', 'Unknown')}\n"
                 f"- **Source:** {article.get('source', 'Unknown')}\n"
                 f"- **URL:** [{article.get('url')}]({article.get('url')})\n"
                 + (f"- **DOI:** {article['doi']}\n" if article.get("doi") else "") +
-                f"- **Abstract:** {article.get('abstract', '')[:500]}...\n"
+                f"- **Abstract:** {abstract[:500]}...\n"
             )
 
         filename = prompt.lower().strip().replace(" ", "_").replace("/", "_")
@@ -154,7 +162,7 @@ def run_agent(prompt: str) -> Dict[str, Any]:
 
     except Exception as e:
         logger.error(f"❌ Agent failed with error: {e}")
-        return {"summary": "", "articles": [], "markdown": "", "output_file": ""}
+        raise e
 
 ##################################################################################################
 #                                               MAIN                                             #
