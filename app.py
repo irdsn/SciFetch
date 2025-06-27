@@ -12,11 +12,14 @@
 #                                            IMPORTS                                             #
 ##################################################################################################
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from agents.scientific_fetcher import run_agent
 import os
 import logging
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from pydantic import BaseModel
+from agents.scientific_fetcher import run_agent
+from utils.config import OUTPUT_DIR
+
 
 ##################################################################################################
 #                                        CONFIGURATION                                           #
@@ -62,7 +65,7 @@ def run_scifetch(request: PromptRequest):
         request (PromptRequest): JSON payload containing 'prompt' and 'api_key'.
 
     Returns:
-        dict: Success message and path to the generated output file.
+        dict: Success message, file info, and Markdown content.
     """
     try:
         # Use request-specific OpenAI API key (does not persist globally)
@@ -71,14 +74,48 @@ def run_scifetch(request: PromptRequest):
         # Run the autonomous agent
         result = run_agent(request.prompt)
 
+        # Read content to return in response
+        with open(result["output_file"], "r", encoding="utf-8") as f:
+            content = f.read()
+
+        filename = result["output_file"].split("/")[-1]
+        download_url = f"https://scifetch.onrender.com/download/{filename}"
+
         return {
             "message": "✅ File generated successfully.",
-            "output_file": result["output_file"]
+            "filename": filename,
+            "download_url": download_url,
+            "output_file": result["output_file"],
+            "content": content
         }
 
     except Exception as e:
         logging.exception("❌ Agent execution failed.")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+
+@app.get("/download/{filename}")
+def download_file(filename: str):
+    """
+    Endpoint to download a generated Markdown report.
+
+    Args:
+        filename (str): Name of the file to download (e.g., result.md)
+
+    Returns:
+        FileResponse: The file as an attachment to trigger download.
+    """
+    file_path = OUTPUT_DIR / filename
+
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+
+    return FileResponse(
+        path=file_path,
+        media_type="text/markdown",
+        filename=filename
+    )
 
 ##################################################################################################
 #                                        ROOT ENDPOINT                                           #
