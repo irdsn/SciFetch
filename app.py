@@ -79,3 +79,17 @@ def run_scifetch(request: PromptRequest):
     except Exception as e:
         logging.exception("❌ Agent execution failed.")
         raise HTTPException(status_code=500, detail=str(e))
+
+##################################################################################################
+#                                        ROOT ENDPOINT                                           #
+##################################################################################################
+
+@app.get("/")
+def read_root():
+    """
+    Root endpoint to verify API status.
+
+    Returns:
+        dict: A welcome message confirming that the API is running.
+    """
+    return {"message": "SciFetch API is up and running!"}

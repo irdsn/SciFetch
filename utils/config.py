@@ -17,10 +17,13 @@ from pathlib import Path
 ##################################################################################################
 
 # Option A: Save outputs to user's Downloads (recommended for deployed usage / FastAPI)
-OUTPUT_DIR = Path.home() / "Downloads" / "SciFetch"
+#OUTPUT_DIR = Path.home() / "Downloads" / "SciFetch"
 
 # Option B: Uncomment to save locally (for CLI / development)
 # OUTPUT_DIR = Path("outputs")
+
+# Option C :Use a Render-safe temp directory
+OUTPUT_DIR = Path("/tmp") / "scifetch_outputs"
 
 # Ensure the directory exists
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
