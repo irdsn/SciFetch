@@ -1,8 +1,6 @@
 TEST-PROMPTS:
 
-I’m looking for the latest advancements in quantum machine learning applications for medical diagnostics
-
-Recent developments in generative AI for protein structure prediction and drug discovery
+Advances in CRISPR-Cas gene editing and implications for rare genetic diseases
 
 Applications of federated learning in privacy-preserving medical image analysis
 
@@ -10,13 +8,14 @@ Climate-resilient urban infrastructure design using AI and remote sensing techno
 
 Ethical implications of AI surveillance in public policy and law enforcement
 
-Topological photonics and their application in next-generation optical communication
+I’m looking for the latest advancements in quantum machine learning applications for medical diagnostics
+
+Recent developments in generative AI for protein structure prediction and drug discovery
 
 Recent trends in neuromorphic computing hardware for edge AI applications
 
-Advances in CRISPR-Cas gene editing and implications for rare genetic diseases
+Sustainable materials in construction: Recent innovations in self-healing concrete
 
 The impact of digital education platforms on higher education outcomes post-COVID
 
-Sustainable materials in construction: Recent innovations in self-healing concrete
-
+Topological photonics and their application in next-generation optical communication
