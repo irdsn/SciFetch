@@ -25,7 +25,7 @@ const InputForm: React.FC<InputFormProps> = ({
 
   return (
     <form onSubmit={handleSubmit} style={{ marginBottom: "2rem" }}>
-      <label htmlFor="prompt">Enter your scientific research prompt:</label>
+      <label htmlFor="prompt">Enter your scientific research request:</label>
       <br />
       <textarea
         id="prompt"
@@ -37,7 +37,7 @@ const InputForm: React.FC<InputFormProps> = ({
       />
       <br />
       <label htmlFor="apiKey" style={{ marginTop: "1rem", display: "block" }}>
-        OpenAI API Key:
+        Enter your OpenAI API Key:
       </label>
       <input
         id="apiKey"

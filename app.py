@@ -36,7 +36,7 @@ app = FastAPI(
     description="SciFetch is an autonomous LangChain-based agent designed to search, summarize, "
                 "and store scientific literature based on user-provided prompts. "
                 "It intelligently selects the best academic APIs for each topic, "
-                "provides a synthesized summary, and outputs results in Markdown.",
+                "provides a synthesized summary, and outputs results in PDF.",
     version="1.0.0"
 )
 
@@ -77,7 +77,7 @@ def run_scifetch(request: PromptRequest):
         request (PromptRequest): JSON payload containing 'prompt' and 'api_key'.
 
     Returns:
-        dict: Success message, file info, and Markdown content.
+        dict: Success message, file info, HTML preview for frontend, and download link for PDF.
     """
     try:
         # Use request-specific OpenAI API key (does not persist globally)
@@ -96,6 +96,8 @@ def run_scifetch(request: PromptRequest):
         # Convert to string path in case it's a Path object
         output_path = str(output_path)
 
+
+        '''
         # Read content to return in response
         with open(output_path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -112,6 +114,17 @@ def run_scifetch(request: PromptRequest):
             "download_url": f"{base_url}/download/{filename}",
             "output_file": result["output_file"],
             "content": content
+        }'''
+
+        filename = os.path.basename(output_path)
+        base_url = os.getenv("BASE_URL", "http://localhost:8000")
+
+        return {
+            "message": "✅ PDF report generated successfully.",
+            "filename": filename,
+            "html_preview": result.get("html_preview"),
+            "download_url": f"{base_url}/download/{filename}",
+            "output_file": output_path
         }
 
     except Exception as e:
@@ -123,7 +136,7 @@ def run_scifetch(request: PromptRequest):
 @app.get("/download/{filename}")
 def download_file(filename: str):
     """
-    Endpoint to download a generated Markdown report.
+    Endpoint to download the generated report.
 
     Args:
         filename (str): Name of the file to download (e.g., result.md)
@@ -138,7 +151,7 @@ def download_file(filename: str):
 
     return FileResponse(
         path=file_path,
-        media_type="application/octet-stream",  # Esto fuerza descarga
+        media_type="application/pdf",
         filename=filename,
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )

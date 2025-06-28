@@ -2,8 +2,8 @@
 #                                        SCIENTIFIC FETCHER                                      #
 #                                                                                                #
 # Autonomous LangChain Agent that chooses the best scientific APIs (tools) to fetch academic     #
-# papers based on a user-defined research prompt. It returns both raw article inputs and a summary #
-# analysis with top relevant articles, and saves the output in Markdown format.                  #
+# papers based on a user-defined research prompt. It returns both raw article inputs and a       #
+# summary analysis with top relevant articles, and saves the output in PDF format.               #
 ##################################################################################################
 
 ##################################################################################################
@@ -17,6 +17,10 @@ from typing import List, Dict, Any
 from langchain.agents import initialize_agent, Tool
 from langchain.agents.agent_types import AgentType
 from langchain_openai import ChatOpenAI
+
+from jinja2 import Environment, FileSystemLoader
+from datetime import datetime
+from weasyprint import HTML
 
 from apis.PubMed import PubMedTool
 from apis.arXiv import ArxivTool
@@ -67,13 +71,13 @@ def run_agent(prompt: str) -> Dict[str, Any]:
     Main function to run the LangChain-based agent for scientific literature retrieval.
 
     Given a research prompt, the agent selects relevant tools (APIs), fetches articles,
-    summarizes the findings, and saves everything in Markdown format.
+    summarizes the findings, and saves everything in PDF format.
 
     Args:
         prompt (str): The research question or topic provided by the user.
 
     Returns:
-        Path: Path to the generated Markdown output file.
+        Path: Path to the generated PDF output file.
     """
 
     tools = [
@@ -133,29 +137,27 @@ def run_agent(prompt: str) -> Dict[str, Any]:
             if title:
                 summary = summary.replace(title, f"**{title}**")
 
-        markdown_output = f"# Scientific Summary\n\n**Prompt:** {prompt}\n\n**Summary:**\n{summary}\n\n---\n\n## Information on the total number of items extracted, including those identified as most relevant by the agent ({len(articles)})\n"
-
-        for idx, article in enumerate(articles, 1):
-            title = article.get("title", "No Title")
-            abstract = article.get("abstract") or ""
-            markdown_output += (
-                f"\n### {idx}. {article.get('title', 'No Title')}\n"
-                f"- **Date:** {article.get('publication_date', 'Unknown')}\n"
-                f"- **Source:** {article.get('source', 'Unknown')}\n"
-                f"- **URL:** [{article.get('url')}]({article.get('url')})\n"
-                + (f"- **DOI:** {article['doi']}\n" if article.get("doi") else "") +
-                f"- **Abstract:** {abstract[:500]}...\n"
-            )
-
         filename = prompt.lower().strip().replace(" ", "_").replace("/", "_")
-        output_path = OUTPUT_DIR / f"{filename}.md"
-        output_path.write_text(markdown_output, encoding="utf-8")
+        pdf_output_path = OUTPUT_DIR / f"{filename}.pdf"
+
+        # Jinja2 template rendering
+        env = Environment(loader=FileSystemLoader("templates"))
+        template = env.get_template("report_template.html")
+        rendered_html = template.render(
+            prompt=prompt,
+            summary=summary,
+            articles=articles,
+            generation_date=datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+        )
+
+        # Save PDF
+        HTML(string=rendered_html).write_pdf(pdf_output_path)
 
         result_data = {
             "summary": summary,
             "articles": articles,
-            "markdown": markdown_output,
-            "output_file": str(output_path)
+            "html_preview": rendered_html,  # Frontend preview
+            "output_file": str(pdf_output_path)
         }
 
         return result_data
@@ -171,5 +173,4 @@ def run_agent(prompt: str) -> Dict[str, Any]:
 if __name__ == "__main__":
     user_prompt = input("Provide your scientific research prompt: ")
     result = run_agent(user_prompt)
-    print(result["markdown"])
     print(f"\n✅ Output saved to: {result['output_file']}")

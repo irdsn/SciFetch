@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SciFetch Report</title>
+  <style>
+    body {
+      font-family: "Georgia", serif;
+      margin: 50px 60px;
+      color: #333;
+      line-height: 1.6;
+      background-color: #fff;
+    }
+
+    h1, h2, h3 {
+      color: #2c3e50;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.8em;
+      margin-bottom: 0.2em;
+    }
+
+    h2 {
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+      margin-top: 2.5em;
+    }
+
+    h3 {
+      margin-top: 1.8em;
+    }
+
+    body p {
+      text-align: justify;
+    }
+
+    .meta p {
+      text-align: center;
+    }
+
+    .meta {
+      font-size: 0.95em;
+      color: #555;
+      text-align: center;
+      margin-bottom: 2em;
+    }
+
+    .meta em {
+      color: #777;
+    }
+
+    .prompt-line {
+      margin: 0;
+    }
+
+    .prompt-line strong {
+      font-weight: 600;
+    }
+
+    .prompt-line em {
+      font-style: italic;
+    }
+
+    .article {
+      margin-bottom: 1.8em;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+
+    .doi, .url {
+      font-size: 0.9em;
+      color: #1a0dab;
+      word-break: break-word;
+    }
+
+    .abstract {
+      margin-top: 0.5em;
+    }
+
+    .footer {
+      margin-top: 3em;
+      font-size: 0.8em;
+      color: #999;
+      text-align: center;
+      border-top: 1px solid #ccc;
+      padding-top: 1em;
+    }
+
+    .footer a {
+      color: #1a0dab;
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .footer p {
+      margin: 0.2em 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>SciFetch Report</h1>
+  <div class="meta" style="text-align: center;">
+    <p><em>Generated on: {{ generation_date }}</em></p>
+    <p class="prompt-line">
+      <strong>Request:</strong> <em>{{ prompt }}</em>
+    </p>
+  </div>
+
+  <h2>Summary</h2>
+  <p>{{ summary }}</p>
+
+  <h2>Relevant Articles</h2>
+  {% for article in articles %}
+    <div class="article">
+      <h3>{{ loop.index }}. <em>{{ article.title }}</em></h3>
+      <p><strong>Date:</strong> {{ article.publication_date or "Unknown" }}</p>
+      <p><strong>Source:</strong> {{ article.source or "Unknown" }}</p>
+      {% if article.doi %}
+        <p class="doi"><strong>DOI:</strong> {{ article.doi }}</p>
+      {% endif %}
+      {% if article.url %}
+        <p class="url"><strong>URL:</strong> <a href="{{ article.url }}">{{ article.url }}</a></p>
+      {% endif %}
+      <p class="abstract"><strong>Abstract:</strong> {{ article.abstract[:500] }}...</p>
+    </div>
+  {% endfor %}
+
+  <div class="footer">
+    <p><strong>Developed by:</strong> Íñigo Rodríguez, AI & Data Engineer</p>
+    <p>
+      <strong>GitHub:</strong>
+      <a href="https://github.com/irdsn">@irdsn</a>
+    </p>
+    <p>
+      Powered by LangChain, FastAPI, Python & Next.js · Using OpenAI Models.
+    </p>
+    <p>
+      Integrated with APIs from arXiv, CrossRef, EuropePMC, OpenAlex and PubMed.
+    </p>
+    <p>
+      For more information, visit the project repository
+      <a href="https://github.com/irdsn/SciFetch">here</a>.
+    </p>
+  </div>
+
+</body>
+</html>
