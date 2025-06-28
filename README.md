@@ -5,7 +5,11 @@
 ![Task](https://img.shields.io/badge/Task-Information_Retrieval-orange)
 ![Last Updated](https://img.shields.io/badge/Last%20Updated-June%202025-brightgreen)
 
-SciFetch is an autonomous LangChain-based agent designed to search, summarize, and store scientific literature based on user-provided prompts. It intelligently selects the best academic APIs for each topic, provides a synthesized summary, and outputs results in Markdown.
+**SciFetch** is an autonomous AI agent designed to search, synthesize, and generate scientific literature reports based on natural language prompts.
+
+It leverages modern AI and web technologies—LangChain for autonomous reasoning, OpenAI for summarization, and academic APIs for up-to-date content retrieval. The final output is delivered as a styled, downloadable **PDF report**, accessible via a clean web interface.
+
+>👉 Try it live at: [https://scifetch.vercel.app](https://scifetch.vercel.app)
 
 ---
 
@@ -21,7 +25,8 @@ Data & AI Engineer
 - [Introduction](#introduction)
 - [Key Features](#key-features)
 - [Project Structure](#project-structure)
-- [Script Overview](#script-overview)
+- [Backend Overview](#backend-overview)
+- [Frontend Overview](#frontend-overview)
 - [Tests & Coverage](#tests--coverage)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -32,33 +37,33 @@ Data & AI Engineer
 
 ## Introduction
 
-**SciFetch** is a Python-based autonomous agent designed to assist researchers in quickly gathering and synthesizing scientific literature.
+**SciFetch** is a full-stack autonomous system designed to assist researchers and professionals in exploring scientific literature efficiently through AI-powered summarization and presentation.
 
-The project originated from real-world needs to automate topic exploration, reduce manual article screening, and centralize findings in well-formatted outputs.  
+Born from the need to automate scientific information retrieval, SciFetch uses a multi-agent architecture to query multiple trusted academic APIs, extract relevant publications, and synthesize a human-readable report in PDF format.
 
-It leverages the power of large language models (GPT-4o), planning agents (LangChain), and multiple academic APIs to retrieve high-quality scientific content.
+It combines the reasoning capabilities of **LangChain agents**, the language generation power of **OpenAI models**, and a **web-friendly interface** built with **Next.js** to offer:
 
-SciFetch aims to provide:
+- Fast and structured access to scientific knowledge.
+- Reliable summarization of complex topics from multiple sources.
+- Ready-to-use, visually styled PDF reports.
+- Deployment flexibility, with both API and browser access.
 
-- Fast and structured access to academic knowledge
-- Summarized, readable overviews of complex topics
-- A foundation for building research tools, assistants, or pipelines
-- Reliability ensured through unit and integration tests with 89% code coverage
+The platform serves both as a **research assistant** and as a **proof of concept** for combining autonomous agents, modern web development, and scientific APIs into an end-to-end application.
 
-> Note: SciFetch currently runs locally and is not yet deployed as a public web service.
 
 ---
 
 ## Key Features
 
-- **Multi-source Scientific Retrieval:** Queries across PubMed, arXiv, OpenAlex, EuropePMC, and CrossRef.
-- **LangChain Autonomous Agent:** Uses a ReAct-style planner to dynamically select the best tools based on the input prompt.
-- **LLM-Powered Summarization:** Synthesizes results into a coherent, human-readable overview using GPT-4o.
-- **Markdown Output Generation:** Exports findings to `.md` files, including summaries and lists of relevant articles.
-- **Graceful Failure Handling:** Logs errors when a specific API fails but continues processing with other sources.
-- **API-Key Secured:** Requires only an OpenAI API key in a `.env` file to run.
-- **Internet-Connected Runtime:** Works with real-time API calls to ensure up-to-date academic content.
-- **Tested for Reliability:** Includes unit and integration tests with 89% coverage to ensure robustness.
+- **Autonomous Literature Agent:** Combines LangChain's ReAct planning with domain-specific tools to select the most relevant academic APIs for each query.
+- **Multi-Source Scientific Retrieval:** Aggregates results from PubMed, arXiv, OpenAlex, EuropePMC, and CrossRef to ensure coverage and diversity.
+- **LLM-Powered Summarization:** Synthesizes complex, multi-source information into a cohesive and accessible summary using OpenAI's GPT models.
+- **Styled PDF Report Generation:** Outputs are delivered as downloadable, professionally formatted PDF documents using custom HTML templates and WeasyPrint.
+- **Modern Web Interface:** Built with Next.js, the frontend allows users to submit research prompts and retrieve results directly from the browser.
+- **Full Public Deployment:** The backend is deployed on Render and the frontend on Vercel, providing instant access at [https://scifetch.vercel.app](https://scifetch.vercel.app).
+- **Graceful Failure Handling:** If one API fails or returns incomplete data, the agent continues processing with the remaining sources.
+- **Secure API Usage:** Requires an OpenAI API key, securely transmitted and handled via environment variables.
+- **Tested for Robustness:** Includes a high-coverage test suite using Pytest (89%) to ensure system reliability and future extensibility.
 
 ---
 
@@ -76,11 +81,19 @@ SciFetch/
 │   ├── OpenAlex.py            # OpenAlex client with inverted abstract decoding
 │   └── PubMed.py              # PubMed search and fetch logic
 │
+├── frontend/                  # Next.js frontend interface
+│   ├── components/            # React components (InputForm, Footer, etc.)
+│   ├── pages/                 # Application pages (index.tsx)
+│   └── styles/                # Global styles and CSS
+│
 ├── inputs/                    
 │   └── prompts.txt            # Input prompts for test runs
 │
 ├── outputs/                   # Generated summaries in Markdown format
-│   └── input_prompt.md        # Example output file (one per input prompt)
+│   └── input_prompt.pdf       # Example PDF output generated by the backend (one per input prompt)
+│
+├── templates/                 # HTML template used for styled PDF rendering
+│   └── report_template.html   # Jinja2-compatible PDF export layout
 │
 ├── tests/                     # Pytest test suite (unit + integration)
 │   ├── test_app.py
@@ -91,12 +104,15 @@ SciFetch/
 │   ├── test_pubmed.py
 │   └── test_scientific_fetcher.py
 │
-├── utils/                     # Utilities and configuration
-│   └── logs_config.py         # Color-coded logging setup
+├── utils/                     # Utilities and helper modules
+│   ├── config.py              # Environment variable loader and backend settings
+│   ├── logs_config.py         # Color-coded logging setup
+│   └── name_sanitizer.py      # PDF filename sanitization utility
 │
 ├── .env.example               # Template for environment variables
 ├── .gitignore                 # Files and folders to ignore in Git
 ├── app.py                     # FastAPI entrypoint for running the agent via HTTP
+├── Procfile                   # Deployment instruction for Render using Uvicorn
 ├── pytest.ini                 # Pytest configuration (warnings, env setup, etc.)
 ├── README.md                  # Project documentation
 └── requirements.txt           # Python dependencies
@@ -104,17 +120,40 @@ SciFetch/
 
 ---
 
-## Script Overview
+## Backend Overview
 
-| Script / Module                | Description                                                                                                                                  |
-|--------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| `agents/scientific_fetcher.py` | Main agent script that takes a user prompt, queries academic APIs, summarizes findings using GPT-4o, and saves the output to Markdown.       |
-| `apis/arXiv.py`                | Interface for querying the arXiv API and extracting metadata. Includes LangChain-compatible tool wrapper.                                    |
-| `apis/CrossRef.py`             | Retrieves publication metadata from CrossRef. Cleans and filters fields like DOI, title, abstract, and date.                                 |
-| `apis/EuropePMC.py`            | Connects to the Europe PMC API and returns structured article metadata. LangChain-ready.                                                     |
-| `apis/OpenAlex.py`             | Queries OpenAlex API and decodes abstracts from inverted index format. Provides unified metadata output.                                     |
-| `apis/PubMed.py`               | Uses PubMed's E-utilities to search and fetch publication metadata. Parses XML response into structured JSON.                                |
-| `utils/logs_config.py`         | Centralized logging configuration with color-coded output for different log levels.                                                          |
+![Backend](https://img.shields.io/badge/Backend-FastAPI-teal)
+
+The backend is developed with FastAPI, providing an HTTP interface to the LangChain-powered agent. It processes user prompts, orchestrates API calls, and generates the final PDF report. The application is deployed on Render, exposing a /run endpoint that receives the input, executes the agent, and returns the path to the generated report.
+
+| Script / Module                  | Description                                                                                                                            |
+|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `agents/scientific_fetcher.py`   | Main agent script that takes a user prompt, queries academic APIs, summarizes findings using GPT-4o, and saves the output to Markdown. |
+| `apis/arXiv.py`                  | Interface for querying the arXiv API and extracting metadata. Includes LangChain-compatible tool wrapper.                              |
+| `apis/CrossRef.py`               | Retrieves publication metadata from CrossRef. Cleans and filters fields like DOI, title, abstract, and date.                           |
+| `apis/EuropePMC.py`              | Connects to the Europe PMC API and returns structured article metadata. LangChain-ready.                                               |
+| `apis/OpenAlex.py`               | Queries OpenAlex API and decodes abstracts from inverted index format. Provides unified metadata output.                               |
+| `apis/PubMed.py`                 | Uses PubMed's E-utilities to search and fetch publication metadata. Parses XML response into structured JSON.                          |
+| `templates/report_template.html` | Jinja2 HTML template used to generate styled PDF reports with article summaries and metadata.                                          |
+| `utils/config.py	`               | Environment variable and path configuration management for both local and deployed environments.                                       |
+| `utils/logs_config.py`           | Centralized logging configuration with color-coded output for different log levels.                                                    |
+| `utils/name_sanitizer.py	`       | Utility for sanitizing prompt strings into safe filenames for saving and downloading reports.                                          |
+
+---
+
+## Frontend Overview
+
+![Next.js](https://img.shields.io/badge/Frontend-Next.js-darkblue)
+
+The frontend is built with Next.js, providing a clean web interface where users can submit prompts, view the response in styled Markdown, and download the result as a PDF. It is deployed on Vercel and connected to the FastAPI backend.
+
+| File                                     | Description                                                             |
+|------------------------------------------|-------------------------------------------------------------------------|
+| `frontend/components/InputForm.tsx`      | Prompt input form component with button handlers and download logic.    |
+| `frontend/components/MarkdownViewer.tsx` | Displays the Markdown-formatted response from the backend.              |
+| `frontend/components/Footer.tsx`         | Footer with author credits and project links.                           |
+| `frontend/pages/index.tsx`               | Main entry point. Hosts the input form, API logic, and renders results. |
+| `frontend/styles/globals.css`            | Global CSS styles for layout, typography, and markdown formatting.      |
 
 ---
 
@@ -208,9 +247,20 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 ## Usage
 
-You can use SciFetch in **two ways**, depending on whether you want an interactive console or a local API.
+You can use SciFetch in **two ways**:
 
-### Option 1: Run the agent via CLI (recommended for exploration)
+### 1. Use the Web App (recommended)
+
+Access the live web application here:
+> https://scifetch.vercel.app
+
+- Enter your research prompt and OpenAI API key.
+- The agent will run automatically, fetch and summarize scientific articles, and display the results. 
+- You can preview the generated content and download a styled PDF report.
+
+### 2. Run Locally via CLI or API (advanced)
+
+#### Option A: Run the agent via CLI
 
 Launch the agent script and enter your prompt interactively:
 
@@ -218,28 +268,21 @@ Launch the agent script and enter your prompt interactively:
 python agents/scientific_fetcher.py
 ```
 
-Then enter your prompt interactively, e.g.:
+You'll be prompted to enter your research query. A PDF file will be saved locally in the outputs/ folder.
 
-```
-Provide your scientific research prompt:
-Applications of self-supervised learning in genomics
-```
-
-Generated outputs will be saved to the `downloads/SciFetch` folder as a `.md` file.
-
-### Option 2: Run the FastAPI server locally
+#### Option B: Run the FastAPI server
 
 You can expose the agent functionality via a local REST API:
 ```bash
 uvicorn app:app --reload
 ```
 
-Then access the interactive documentation at:
+Then access the interactive documentation (API) at:
 ```bash
 http://127.0.0.1:8000/docs
 ```
 
-The /run endpoint expects a POST request with the following JSON body:
+Send a POST request to /run endpoint with the following JSON:
 ```json
 {
   "prompt": "Applications of self-supervised learning in genomics",
@@ -250,27 +293,25 @@ The /run endpoint expects a POST request with the following JSON body:
 The server will return:
 ```json
 {
-  "message": "✅ File generated successfully.",
-  "output_file": "/Users/user/Downloads/SciFetch/applications_of_self-supervised_learning_in_genomics.md"
+  "html_preview": "<...>",
+  "download_url": "/outputs/your_report.pdf"
 }
 ```
 
-The OpenAI API key is required for every request, even if already present in the .env file.
+The api_key is required in every request and must be a valid OpenAI key.
 
 ---
 
 ## Future Work
 
-Although SciFetch is functional and production-ready, there are multiple directions for future enhancements:
+Although SciFetch is functional and publicly accessible, there are several directions for future enhancement:
 
-- **LLM Self-Evaluation:** Score or rank article relevance based on confidence or alignment with the prompt.
-- **PDF Exporting Support:** Add native `.pdf` export alongside Markdown.
-- **API Usage Monitoring:** Track rate limits, quota consumption, and retries per tool.
-- **Multilingual Summarization:** Enable output generation in multiple languages.
-- **Tool Expansion:** Include additional APIs like Semantic Scholar, CORE, or IEEE Xplore.
-- **Web Interface:** Provide a lightweight web app (e.g., Streamlit) for broader accessibility.
-- **Offline LLM Compatibility:** Explore integration with open-source models (e.g., LLaMA or Mistral) for offline use.
-- **Public Deployment Option:** Explore hosting the FastAPI backend on platforms to make SciFetch publicly accessible.
+- **LLM Self-Evaluation:** Implement article scoring or ranking based on relevance confidence.
+- **Advanced PDF Formatting:** Enhance visual formatting with typographic refinements, tables, or charts.
+- **API Usage Monitoring:** Track rate limits, quota consumption, and per-tool fallback metrics.
+- **Multilingual Summarization:** Allow output generation in languages other than English.
+- **Tool Expansion:** Add support for new academic APIs (e.g., Semantic Scholar, CORE, IEEE Xplore).
+- **Offline LLM Compatibility:** Explore use of local open-source models (e.g., Mistral, LLaMA) for air-gapped environments.
 
 ---
 

@@ -58,7 +58,8 @@ export default function Home() {
         </h1>
 
         <p style={{ color: "#444", marginBottom: "2rem" }}>
-          SciFetch is an autonomous LangChain-based agent designed to search, summarize, and store scientific literature based on user-provided prompts. It intelligently selects the best academic APIs for each topic, provides a synthesized summary, and outputs results in PDF.
+          SciFetch is an autonomous AI agent designed to search, synthesize, and generate scientific literature reports based on natural language prompts.
+          It leverages modern AI and web technologies—LangChain for autonomous reasoning, OpenAI for summarization, and academic APIs for up-to-date content retrieval. The final output is delivered as a styled, downloadable PDF report, accessible via a clean web interface.
         </p>
 
         <InputForm
