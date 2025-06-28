@@ -96,35 +96,15 @@ def run_scifetch(request: PromptRequest):
         # Convert to string path in case it's a Path object
         output_path = str(output_path)
 
-
-        '''
-        # Read content to return in response
-        with open(output_path, "r", encoding="utf-8") as f:
-            content = f.read()
-
-        filename = result["output_file"].split("/")[-1]
-        download_url = f"https://scifetch.onrender.com/download/{filename}"
-
-        base_url = os.getenv("BASE_URL", "http://localhost:8000")
-
-        return {
-            "message": "✅ File generated successfully.",
-            "filename": filename,
-            "preview_url": f"{base_url}/preview/{filename}",
-            "download_url": f"{base_url}/download/{filename}",
-            "output_file": result["output_file"],
-            "content": content
-        }'''
-
         filename = os.path.basename(output_path)
         base_url = os.getenv("BASE_URL", "http://localhost:8000")
 
         return {
             "message": "✅ PDF report generated successfully.",
             "filename": filename,
-            "html_preview": result.get("html_preview"),
             "download_url": f"{base_url}/download/{filename}",
-            "output_file": output_path
+            "output_file": output_path,
+            "html_preview": result.get("html_preview")
         }
 
     except Exception as e:
