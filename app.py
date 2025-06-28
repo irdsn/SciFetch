@@ -14,12 +14,15 @@
 
 import os
 import logging
+import urllib.parse
+
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from agents.scientific_fetcher import run_agent
 from utils.config import OUTPUT_DIR
+from utils.name_sanitizer import slugify_filename
 
 ##################################################################################################
 #                                        CONFIGURATION                                           #
@@ -115,30 +118,37 @@ def run_scifetch(request: PromptRequest):
         logging.exception("❌ Agent execution failed.")
         raise HTTPException(status_code=500, detail=str(e))
 
-
-
-@app.get("/download/{filename}")
+@app.get("/download/{filename}", summary="Download PDF report")
 def download_file(filename: str):
     """
-    Endpoint to download the generated report.
+    Endpoint to download a previously generated PDF report.
 
     Args:
-        filename (str): Name of the file to download (e.g., result.md)
+        filename (str): The name of the file to be downloaded (as received from frontend or listing).
 
     Returns:
-        FileResponse: The file as an attachment to trigger download.
+        FileResponse: The requested PDF file with a sanitized filename and proper encoding headers.
     """
-    file_path = OUTPUT_DIR / filename
+    # Sanitize the filename to ensure safe filesystem usage
+    sanitized_name = slugify_filename(filename).replace(".pdf", "") + ".pdf"
+    file_path = OUTPUT_DIR / sanitized_name
 
+    # Raise error if file does not exist
     if not file_path.exists():
-        raise HTTPException(status_code=404, detail="File not found")
+        raise HTTPException(status_code=404, detail="Requested file not found.")
 
+    # Encode filename to be compatible with HTTP headers (RFC 5987)
+    encoded_filename = urllib.parse.quote(sanitized_name)
+    content_disposition = f"attachment; filename*=UTF-8''{encoded_filename}"
+
+    # Return the file as a downloadable response with proper headers
     return FileResponse(
         path=file_path,
+        filename=sanitized_name,
         media_type="application/pdf",
-        filename=filename,
-        headers={"Content-Disposition": f"attachment; filename={filename}"}
+        headers={"Content-Disposition": content_disposition}
     )
+
 
 ##################################################################################################
 #                                        ROOT ENDPOINT                                           #

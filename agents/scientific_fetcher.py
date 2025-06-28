@@ -10,8 +10,6 @@
 #                                            IMPORTS                                             #
 ##################################################################################################
 
-import re
-import unicodedata
 from dotenv import load_dotenv
 from pathlib import Path
 from typing import List, Dict, Any
@@ -32,6 +30,7 @@ from apis.CrossRef import CrossRefTool
 
 from utils.logs_config import logger
 from utils.config import OUTPUT_DIR
+from utils.name_sanitizer import slugify_filename
 
 ##################################################################################################
 #                                        CONFIGURATION                                           #
@@ -42,16 +41,6 @@ load_dotenv()
 ##################################################################################################
 #                                        IMPLEMENTATION                                          #
 ##################################################################################################
-
-
-
-def slugify_filename(text: str) -> str:
-    # Normalises and removes problematic unicode characters
-    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
-    # Substitute anything that is not a letter, number, hyphen or underline
-    text = re.sub(r"[^\w\s-]", "", text).strip().lower()
-    # Sustituye espacios y guiones por "_"
-    return re.sub(r"[-\s]+", "_", text)
 
 def extract_relevant_articles(summary: str, articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
