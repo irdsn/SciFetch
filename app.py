@@ -46,11 +46,15 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend local
+    allow_origins=[
+        "http://localhost:3000",             # Frontend local deployment
+        "https://scifetch.vercel.app",       # Frontend Vercel deployment
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 ##################################################################################################
 #                                         REQUEST MODEL                                          #
