@@ -143,6 +143,12 @@ def run_agent(prompt: str) -> Dict[str, Any]:
         # Jinja2 template rendering
         env = Environment(loader=FileSystemLoader("templates"))
         template = env.get_template("report_template.html")
+
+        # Ensure all articles have 'abstract' as a string to avoid NoneType errors in template
+        for article in articles:
+            if article.get("abstract") is None:
+                article["abstract"] = ""
+
         rendered_html = template.render(
             prompt=prompt,
             summary=summary,
