@@ -10,6 +10,8 @@
 #                                            IMPORTS                                             #
 ##################################################################################################
 
+import re
+import unicodedata
 from dotenv import load_dotenv
 from pathlib import Path
 from typing import List, Dict, Any
@@ -40,6 +42,16 @@ load_dotenv()
 ##################################################################################################
 #                                        IMPLEMENTATION                                          #
 ##################################################################################################
+
+
+
+def slugify_filename(text: str) -> str:
+    # Normalises and removes problematic unicode characters
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("ascii")
+    # Substitute anything that is not a letter, number, hyphen or underline
+    text = re.sub(r"[^\w\s-]", "", text).strip().lower()
+    # Sustituye espacios y guiones por "_"
+    return re.sub(r"[-\s]+", "_", text)
 
 def extract_relevant_articles(summary: str, articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
@@ -137,7 +149,7 @@ def run_agent(prompt: str) -> Dict[str, Any]:
             if title:
                 summary = summary.replace(title, f"**{title}**")
 
-        filename = prompt.lower().strip().replace(" ", "_").replace("/", "_")
+        filename = slugify_filename(prompt) or "scifetch_report"
         pdf_output_path = OUTPUT_DIR / f"{filename}.pdf"
 
         # Jinja2 template rendering
