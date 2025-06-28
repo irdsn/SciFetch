@@ -20,7 +20,7 @@ export default function Home() {
     setDownloadUrl("");
 
     try {
-      const response = await fetch("http://localhost:8000/run", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SCIFETCH_API}/run`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
