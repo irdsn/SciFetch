@@ -66,6 +66,23 @@ The platform serves both as a **research assistant** and as a **proof of concept
 - **Tested for Robustness:** Includes a high-coverage test suite using Pytest (89%) to ensure system reliability and future extensibility.
 
 ---
+## Scientific Domain Coverage
+
+SciFetch integrates multiple academic APIs, each specializing in different scientific domains. Understanding the scope of each can help formulate more effective prompts.
+
+| API                                           | Covered Domains (Examples)                                                                               |
+|-----------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| [**arXiv**](https://arxiv.org)                | Hard Sciences & CS: Artificial Intelligence, Physics, Mathematics, Computer Vision, Quantitative Finance |
+| [**CrossRef**](https://www.crossref.org)      | General Metadata: Scientific articles from all disciplines including Arts, Law, and Engineering          |
+| [**EuropePMC**](https://europepmc.org)        | Biomedical (Europe-focused): Pharmacology, Virology, Bioinformatics, Clinical Trials                     |
+| [**OpenAlex**](https://openalex.org)          | Multidisciplinary: Education, Social Sciences, Computer Science, Psychology, Economics                   |
+| [**PubMed**](https://pubmed.ncbi.nlm.nih.gov) | Biomedical & Life Sciences: Medicine, Genomics, Neuroscience, Public Health                              |
+ 
+> 💡 **Prompt Tip:**  
+> When querying SciFetch, focus on topics within **healthcare, AI, bioinformatics, computer science, or physics**, as these are well represented in the integrated repositories.  
+> Niche fields (e.g., Art Theory, Theology) may return sparse or irrelevant results.
+
+---
 
 ## Project Structure
 
@@ -123,6 +140,8 @@ SciFetch/
 ## Backend Overview
 
 ![Backend](https://img.shields.io/badge/Backend-FastAPI-teal)
+![Hosted on Render](https://img.shields.io/badge/Hosted--on-Render-indigo)
+
 
 The backend is developed with FastAPI, providing an HTTP interface to the LangChain-powered agent. It processes user prompts, orchestrates API calls, and generates the final PDF report. The application is deployed on Render, exposing a /run endpoint that receives the input, executes the agent, and returns the path to the generated report.
 
@@ -144,6 +163,7 @@ The backend is developed with FastAPI, providing an HTTP interface to the LangCh
 ## Frontend Overview
 
 ![Next.js](https://img.shields.io/badge/Frontend-Next.js-darkblue)
+![Hosted on Vercel](https://img.shields.io/badge/Hosted--on-Vercel-black)
 
 The frontend is built with Next.js, providing a clean web interface where users can submit prompts, view the response in styled Markdown, and download the result as a PDF. It is deployed on Vercel and connected to the FastAPI backend.
 
