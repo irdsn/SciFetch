@@ -24,6 +24,7 @@ Data & AI Engineer
 
 - [Introduction](#introduction)
 - [Key Features](#key-features)
+- [Scientific Domain Coverage](#scientific-domain-coverage)
 - [Project Structure](#project-structure)
 - [Backend Overview](#backend-overview)
 - [Frontend Overview](#frontend-overview)
